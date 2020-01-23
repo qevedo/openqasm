@@ -1,2 +1,0 @@
-def testing():
-	print('Hey!')
