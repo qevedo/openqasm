@@ -2,7 +2,7 @@
 
 [![PyPI Version][openqasm-pi]][openqasm-pu]
 [![Build Status][openqasm-ti]][openqasm-tu]
-[![Dependencies][openqasm-di]][openqasm-du]
+[![Dependency Status][openqasm-di]][openqasm-du]
 [![Python Version][python-vi]][python-vu]
 
 An OPENQASM 2.0 parser for Python
