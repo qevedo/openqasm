@@ -4,7 +4,7 @@ import os
 import unittest
 import ply
 
-from openqasm.qasm import Qasm, QasmError
+from openqasm import Qasm, QasmError
 from openqasm.node.node import Node
 from openqasm.test import OpenqasmTestCase, Path
 

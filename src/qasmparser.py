@@ -26,7 +26,6 @@ from . import node
 from .exceptions import QasmError
 from .qasmlexer import QasmLexer
 
-
 class QasmParser:
     """OPENQASM Parser."""
 
