@@ -31,5 +31,5 @@ print(ast.qasm(15))
 
 Apache 2.0
 
-[openqasm-ti]: https://api.travis-ci.com/qevedo/openqasm.svg?branch=master
+[openqasm-ti]: https://img.shields.io/travis/com/qevedo/openqasm/master.svg
 [openqasm-tu]: https://travis-ci.com/qevedo/openqasm
