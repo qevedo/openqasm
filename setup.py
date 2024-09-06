@@ -8,7 +8,7 @@ print(setuptools.find_packages())
 
 setuptools.setup(
 	name="openqasm",
-	version="0.0.1",
+	version="0.1.0",
 	author="Alex",
 	author_email="alxmorais8@msn.com",
 	description="Parser for OPENQASM",
