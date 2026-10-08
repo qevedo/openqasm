@@ -33,8 +33,9 @@ if [ ! -f "$jar" ]; then
     curl -sSfL -o "$jar" \
         "https://repo1.maven.org/maven2/org/antlr/antlr4/$ANTLR_VERSION/antlr4-$ANTLR_VERSION-complete.jar"
 fi
-generated="$repo/source/openqasm/openqasm3/_antlr/_${ANTLR_VERSION%.*}"
-generated="${generated//./_}"
+# The reference package looks for the parser in _antlr/_<major>_<minor>.
+antlr_minor="${ANTLR_VERSION%.*}"
+generated="$repo/source/openqasm/openqasm3/_antlr/_${antlr_minor//./_}"
 if [ ! -d "$generated" ]; then
     (cd "$repo/source/grammar" && java -jar "$jar" -o "$generated" -Dlanguage=Python3 -visitor \
         qasm3Lexer.g4 qasm3Parser.g4)
