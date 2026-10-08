@@ -29,7 +29,7 @@ class Qasm:
         if filename is None and data is None:
             raise QasmError("Missing input file and/or data")
         if filename is not None and data is not None:
-            raise QasmError("File and data must not both be specified"
+            raise QasmError("File and data must not both be specified "
                             "initializing qasm")
         self._filename = filename
         self._data = data
@@ -56,7 +56,7 @@ class Qasm:
                 self._data = ifile.read()
 
         with QasmParser(self._filename) as qasm_p:
-            return qasm_p.read_tokens()
+            return qasm_p.read_tokens(None if self._filename else self._data)
 
     def parse(self):
         """Parse the data."""

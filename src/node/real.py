@@ -62,4 +62,4 @@ class Real(Node):
     def real(self, nested_scope=None):
         """Return the correspond floating point number."""
         del nested_scope  # unused
-        return float(self.value.evalf())
+        return float(self.value)

@@ -21,13 +21,12 @@ by creating a stack of lexers.
 
 import os
 
-import numpy as np
-import ply.lex as lex
+from ply import lex
 
 from . import node
 from .exceptions import QasmError
 
-CORE_LIBS_PATH = os.path.join(os.path.dirname(__file__), 'libs')
+CORE_LIBS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs')
 CORE_LIBS = os.listdir(CORE_LIBS_PATH)
 
 
@@ -65,6 +64,21 @@ class QasmLexer:
         """Return the next token."""
         ret = self.lexer.token()
         return ret
+
+    def _resolve_include(self, incfile):
+        """Find an included file.
+
+        The standard library (``qelib1.inc``) always wins, then the path is tried
+        relative to the including file and finally relative to the working
+        directory.
+        """
+        if incfile in CORE_LIBS:
+            return os.path.join(CORE_LIBS_PATH, incfile)
+        if self.filename and not os.path.isabs(incfile):
+            candidate = os.path.join(os.path.dirname(self.filename), incfile)
+            if os.path.exists(candidate):
+                return candidate
+        return incfile
 
     def pop(self):
         """Pop a PLY lexer off the stack."""
@@ -106,10 +120,7 @@ class QasmLexer:
 
     def t_REAL(self, t):
         r'(([0-9]+|([0-9]+)?\.[0-9]+|[0-9]+\.)[eE][+-]?[0-9]+)|(([0-9]+)?\.[0-9]+|[0-9]+\.)'
-        if np.iscomplex(t):
-            return t.real
-        else:
-            return t
+        return t
 
     def t_NNINTEGER(self, t):
         r'[1-9]+[0-9]*|0'
@@ -148,8 +159,7 @@ class QasmLexer:
         else:
             raise QasmError("Invalid include: must be a quoted string.")
 
-        if incfile in CORE_LIBS:
-            incfile = os.path.join(CORE_LIBS_PATH, incfile)
+        incfile = self._resolve_include(incfile)
 
         next_token = self.lexer.token()
         if next_token is None or next_token.value != ';':
@@ -163,7 +173,7 @@ class QasmLexer:
         return self.lexer.token()
 
     def t_FORMAT(self, t):
-        r'OPENQASM\s+(\d+)\.(\d+)'
+        r'OPENQASM\s+[0-9]+(\.[0-9]+)?'
         return t
 
     def t_COMMENT(self, t):
@@ -201,6 +211,7 @@ class QasmLexer:
     t_ignore = ' \t\r'
 
     def t_error(self, t):
-        print("Unable to match any token rule, got -->%s<--" % t.value[0])
-        print("Check your OPENQASM source and any include statements.")
-        # t.lexer.skip(1)
+        raise QasmError(
+            "Unable to match any token rule, got -->%s<-- at line %s, file %s."
+            % (t.value[0], self.lineno, self.filename),
+            "Check your OPENQASM source and any include statements.")

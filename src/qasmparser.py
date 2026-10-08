@@ -20,11 +20,20 @@ import tempfile
 import warnings
 
 import numpy as np
-import ply.yacc as yacc
+from ply import yacc
 
 from . import node
 from .exceptions import QasmError
-from .qasmlexer import QasmLexer
+from .qasmlexer import CORE_LIBS_PATH, QasmLexer
+
+# Gates of the qelib1.inc published with the OpenQASM 2.0 specification.  The
+# bundled qelib1.inc defines more gates (sx, rxx, cu, ...) that many programs
+# written against the original header define themselves; those programs may
+# redefine the extra gates.
+SPEC_QELIB1_GATES = frozenset([
+    'u3', 'u2', 'u1', 'cx', 'id', 'x', 'y', 'z', 'h', 's', 'sdg', 't', 'tdg',
+    'rx', 'ry', 'rz', 'cz', 'cy', 'ch', 'ccx', 'crz', 'cu1', 'cu3',
+])
 
 class QasmParser:
     """OPENQASM Parser."""
@@ -47,6 +56,7 @@ class QasmParser:
         self.parser = yacc.yacc(module=self, debug=False,
                                 outputdir=self.parse_dir)
         self.qasm = None
+        self.last_error = None
         self.parse_deb = False
         self.global_symtab = {}                          # global symtab
         self.current_symtab = self.global_symtab         # top of symbol stack
@@ -72,12 +82,24 @@ class QasmParser:
         """
         if obj.name in self.current_symtab:
             prev = self.current_symtab[obj.name]
+            if self._is_overridable(obj, prev):
+                obj.overrides = prev
+                self.current_symtab[obj.name] = obj
+                return
             raise QasmError("Duplicate declaration for", obj.type + " '"
                             + obj.name + "' at line", str(obj.line)
                             + ', file', obj.file
                             + '.\nPrevious occurrence at line',
                             str(prev.line) + ', file', prev.file)
         self.current_symtab[obj.name] = obj
+
+    def _is_overridable(self, obj, prev):
+        """Whether a user gate may replace a gate of the bundled library."""
+        return (obj.type in ('gate', 'opaque')
+                and prev.type in ('gate', 'opaque')
+                and obj.name not in SPEC_QELIB1_GATES
+                and os.path.dirname(os.path.abspath(prev.file)) == CORE_LIBS_PATH
+                and os.path.dirname(os.path.abspath(obj.file)) != CORE_LIBS_PATH)
 
     def verify_declared_bit(self, obj):
         """Verify a qubit id against the gate prototype."""
@@ -288,6 +310,9 @@ class QasmParser:
            program : program statement
         """
         program[0] = program[1]
+        overridden = getattr(program[2], 'overrides', None)
+        if overridden is not None:
+            program[0].children.remove(overridden)
         program[0].add_child(program[2])
 
     # ----------------------------------------
@@ -314,7 +339,11 @@ class QasmParser:
         """
            format : FORMAT
         """
-        program[0] = node.Format(program[1])
+        version = node.Format(program[1])
+        if (version.majorversion, version.minorversion) != ("2", "0"):
+            raise QasmError("Invalid version: '%s'. This module supports OpenQASM 2.0 only."
+                            % version.version())
+        program[0] = version
 
     def p_format_0(self, program):
         """
@@ -1028,8 +1057,10 @@ class QasmParser:
             raise QasmError("Error at end of file. "
                             + "Perhaps there is a missing ';'")
 
-        col = self.find_column(self.lexer.data, program)
-        print("Error near line", str(self.lexer.lineno), 'Column', col)
+        # Remember where things went wrong; the error productions raise a
+        # more specific message, and parse() falls back to this location.
+        self.last_error = (program.value, self.lexer.lineno,
+                           self.find_column(self.lexer.data, program))
 
     def find_column(self, input_, token):
         """Compute the column.
@@ -1060,18 +1091,17 @@ class QasmParser:
         except QasmError as e:
             print('Exception tokenizing qasm file:', e.msg)
 
-    def read_tokens(self):
+    def read_tokens(self, data=None):
         """finds and reads the tokens."""
-        try:
-            while True:
-                token = self.lexer.token()
+        if data is not None:
+            self.lexer.input(data)
+        while True:
+            token = self.lexer.token()
 
-                if not token:
-                    break
+            if not token:
+                break
 
-                yield token
-        except QasmError as e:
-            print('Exception tokenizing qasm file:', e.msg)
+            yield token
 
     def parse_debug(self, val):
         """Set the parse_deb field."""
@@ -1086,7 +1116,11 @@ class QasmParser:
     def parse(self, data):
         """Parse some data."""
         self.parser.parse(data, lexer=self.lexer, debug=self.parse_deb)
-        if self.qasm is None:
+        if self.qasm is None or self.last_error is not None:
+            if self.last_error is not None:
+                value, line, col = self.last_error
+                raise QasmError("Invalid syntax near '%s' at line %d, column %d, file %s"
+                                % (value, line, col, self.lexer.filename))
             raise QasmError("Uncaught exception in parser; "
                             + "see previous messages for details.")
         return self.qasm
