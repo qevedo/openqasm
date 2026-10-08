@@ -54,11 +54,11 @@ See [CHANGELOG.md](CHANGELOG.md) for changes.
 
 Apache 2.0
 
-[openqasm-pi]: https://img.shields.io/pypi/v/openqasm
-[openqasm-pu]: https://pypi.org/project/openqasm
+[openqasm-pi]: https://img.shields.io/github/v/tag/qevedo/openqasm?filter=v2.*&label=pypi&cacheSeconds=3600
+[openqasm-pu]: https://pypi.org/project/openqasm/#history
 [openqasm-ti]: https://github.com/qevedo/openqasm/actions/workflows/ci.yml/badge.svg?branch=v2
 [openqasm-tu]: https://github.com/qevedo/openqasm/actions/workflows/ci.yml
 [openqasm-di]: https://img.shields.io/librariesio/github/qevedo/openqasm
 [openqasm-du]: https://pypi.org/project/openqasm
-[python-vi]: https://img.shields.io/pypi/pyversions/openqasm
+[python-vi]: https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fqevedo%2Fopenqasm%2Fv2%2Fpyproject.toml&cacheSeconds=3600
 [python-vu]: https://pypi.org/project/openqasm
