@@ -36,6 +36,8 @@ include-package-data = false
 
 [tool.setuptools.package-data]
 openqasm = ["libs/*.inc"]
+# The example programs used by the test suite.
+"openqasm.test" = ["examples/*.qasm", "examples/*/*.qasm", "examples/*/*.inc"]
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
