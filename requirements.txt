@@ -1,3 +1,0 @@
-pylatexenc==1.4
-ply==3.11
-numpy==1.22.0

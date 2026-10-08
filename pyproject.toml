@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openqasm"
+version = "2.0.0"
+description = "Parser for OpenQASM 2.0"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Alex", email = "alxmorais8@msn.com" }]
+requires-python = ">=3.8"
+dependencies = [
+    "ply>=3.11",
+    "numpy>=1.17",
+]
+keywords = ["openqasm", "qasm", "quantum", "parser"]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.optional-dependencies]
+latex = ["pylatexenc>=1.4"]
+test = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/qevedo/openqasm"
+Source = "https://github.com/qevedo/openqasm/tree/v2"
+
+[tool.setuptools]
+packages = ["openqasm", "openqasm.node", "openqasm.test"]
+package-dir = { "openqasm" = "src", "openqasm.node" = "src/node", "openqasm.test" = "test" }
+include-package-data = false
+
+[tool.setuptools.package-data]
+openqasm = ["libs/*.inc"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]

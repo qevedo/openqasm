@@ -5,13 +5,19 @@
 [![Dependency Status][openqasm-di]][openqasm-du]
 [![Python Version][python-vi]][python-vu]
 
-An OPENQASM 2.0 parser for Python
+An OpenQASM 2.0 parser for Python.
+
+> This is the `v2` branch, which holds the **OpenQASM 2** parser
+> (`openqasm` 2.x on PyPI). OpenQASM 3 lives on `master` (`openqasm` 3.x).
 
 ## Installation
 
 ```sh
-pip install openqasm
+pip install "openqasm<3"
 ```
+
+To export expressions to LaTeX, install the optional extra:
+`pip install "openqasm[latex]<3"`.
 
 ## Usage
 
@@ -30,15 +36,29 @@ ast = qasm.parse()
 print(ast.qasm(15))
 ```
 
+The bundled `qelib1.inc` is the final version of the IBM/Qiskit standard
+header. It contains every gate of the specification's `qelib1.inc` plus newer
+gates (`sx`, `rxx`, `cu`, ...). Programs that define those newer gates
+themselves keep working: their definition replaces the bundled one.
+
+## Development
+
+```sh
+pip install -e ".[test,latex]"
+pytest
+```
+
+See [CHANGELOG.md](CHANGELOG.md) for changes.
+
 ## License
 
 Apache 2.0
 
 [openqasm-pi]: https://img.shields.io/pypi/v/openqasm
 [openqasm-pu]: https://pypi.org/project/openqasm
-[openqasm-ti]: https://img.shields.io/travis/com/qevedo/openqasm/master.svg
-[openqasm-tu]: https://travis-ci.com/qevedo/openqasm
+[openqasm-ti]: https://github.com/qevedo/openqasm/actions/workflows/ci.yml/badge.svg?branch=v2
+[openqasm-tu]: https://github.com/qevedo/openqasm/actions/workflows/ci.yml
 [openqasm-di]: https://img.shields.io/librariesio/github/qevedo/openqasm
 [openqasm-du]: https://pypi.org/project/openqasm
-[python-vi]: https://img.shields.io/badge/python-3.5-blue.svg
-[python-vu]: https://python.org/downloads/release/python-350/
+[python-vi]: https://img.shields.io/pypi/pyversions/openqasm
+[python-vu]: https://pypi.org/project/openqasm
