@@ -1,7 +1,12 @@
 # Python
 build
 dist
-openqasm.egg-info
-
+*.egg-info
 __pycache__
 .pytest_cache
+.venv
+
+# Conformance suite checkout (tests/conformance/run.sh)
+.conformance
+.mypy_cache
+.ruff_cache

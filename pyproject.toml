@@ -1,41 +1,64 @@
 [build-system]
-requires = ["setuptools>=64"]
+requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "openqasm"
-version = "2.0.0"
-description = "Parser for OpenQASM 2.0"
+version = "3.0.0"
+description = "Parser, semantic analyser and printer for OpenQASM 3 (and OpenQASM 2) programs"
 readme = "README.md"
-license = { text = "Apache-2.0" }
+license = "MIT AND Apache-2.0"
+license-files = ["LICENSE", "src/openqasm/stdlib/LICENSE"]
 authors = [{ name = "Alex", email = "alxmorais8@msn.com" }]
-requires-python = ">=3.8"
-dependencies = [
-    "ply>=3.11",
-    "numpy>=1.17",
-]
-keywords = ["openqasm", "qasm", "quantum", "parser"]
+requires-python = ">=3.10"
+dependencies = []
+keywords = ["openqasm", "qasm", "quantum", "quantum computing", "parser", "compiler"]
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Compilers",
+    "Typing :: Typed",
 ]
 
 [project.optional-dependencies]
-latex = ["pylatexenc>=1.4"]
 test = ["pytest>=7"]
+
+[project.scripts]
+openqasm = "openqasm.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/qevedo/openqasm"
-Source = "https://github.com/qevedo/openqasm/tree/v2"
+Source = "https://github.com/qevedo/openqasm"
+Changelog = "https://github.com/qevedo/openqasm/blob/master/CHANGELOG.md"
 
-[tool.setuptools]
-packages = ["openqasm", "openqasm.node", "openqasm.test"]
-package-dir = { "openqasm" = "src", "openqasm.node" = "src/node", "openqasm.test" = "test" }
-include-package-data = false
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools.package-data]
-openqasm = ["libs/*.inc"]
+openqasm = ["py.typed", "stdlib/*.inc"]
 
 [tool.pytest.ini_options]
-testpaths = ["test"]
+testpaths = ["tests"]
+# The conformance suite needs a checkout of the OpenQASM repository; see
+# tests/conformance/README.md.
+addopts = "--ignore=tests/conformance"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "SIM", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests keep long literal programs and expected messages on one line.
+"tests/**" = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src/openqasm"]

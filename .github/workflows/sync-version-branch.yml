@@ -1,0 +1,31 @@
+name: Sync version branch
+
+# master always holds the latest major version. Keep its version branch
+# (v3 while openqasm is 3.x) pointing at the same commit, so that every
+# version has a branch named after it.
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fast-forward the version branch to master
+        run: |
+          major=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'].split('.')[0])")
+          branch="v$major"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            git fetch origin "$branch"
+            if ! git merge-base --is-ancestor "origin/$branch" HEAD; then
+              echo "::error::$branch has commits that are not on master; merge them into master first"
+              exit 1
+            fi
+          fi
+          git push origin "HEAD:refs/heads/$branch"

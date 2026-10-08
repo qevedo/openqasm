@@ -2,33 +2,52 @@ name: CI
 
 on:
   push:
-    branches: [ v2 ]
+    branches: [master, "v[0-9]*"]
   pull_request:
-    branches: [ v2 ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
       - name: Install
-        run: |
-          python -m pip install --upgrade pip
-          pip install ".[test,latex]"
-
+        run: python -m pip install ".[test]"
       - name: Test
-        # Run from outside the checkout so the installed package is tested.
-        working-directory: ${{ runner.temp }}
-        run: pytest ${{ github.workspace }}/test
+        run: pytest
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install ruff mypy
+      - run: ruff check src tests
+      - run: ruff format --check src tests
+      - run: mypy
+
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/cache@v4
+        with:
+          path: .conformance
+          key: conformance-${{ hashFiles('tests/conformance/run.sh') }}
+      - name: Conformance against the reference implementation
+        run: tests/conformance/run.sh
