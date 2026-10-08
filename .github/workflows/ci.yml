@@ -5,6 +5,8 @@ on:
     branches: [ v2 ]
   pull_request:
     branches: [ v2 ]
+  # Run by the release workflow before publishing.
+  workflow_call:
 
 jobs:
   test:
