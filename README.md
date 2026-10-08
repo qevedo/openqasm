@@ -173,8 +173,8 @@ MIT. `src/openqasm/stdlib/stdgates.inc` and `qelib1.inc` are the standard
 libraries of the OpenQASM specification and stay under Apache 2.0 (see
 `src/openqasm/stdlib/LICENSE`).
 
-[pypi-badge]: https://img.shields.io/pypi/v/openqasm
+[pypi-badge]: https://img.shields.io/pypi/v/openqasm?cacheSeconds=3600
 [pypi]: https://pypi.org/project/openqasm
 [ci-badge]: https://github.com/qevedo/openqasm/actions/workflows/ci.yml/badge.svg?branch=master
 [ci]: https://github.com/qevedo/openqasm/actions/workflows/ci.yml
-[python-badge]: https://img.shields.io/pypi/pyversions/openqasm
+[python-badge]: https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fqevedo%2Fopenqasm%2Fmaster%2Fpyproject.toml&cacheSeconds=3600
