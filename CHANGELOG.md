@@ -4,6 +4,12 @@
 OpenQASM 2-only parser (`openqasm` 2.x) is maintained on the `v2` branch,
 which has its own changelog.
 
+## 3.0.1
+
+- Relicensed from Apache 2.0 to MIT. The bundled `stdgates.inc` and
+  `qelib1.inc` come from the OpenQASM specification and stay under Apache 2.0
+  (`src/openqasm/stdlib/LICENSE`).
+
 ## 3.0.0
 
 A new implementation for OpenQASM 3, written from scratch. It shares no code

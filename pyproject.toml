@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openqasm"
-version = "3.0.0"
+version = "3.0.1"
 description = "Parser, semantic analyser and printer for OpenQASM 3 (and OpenQASM 2) programs"
 readme = "README.md"
 license = "MIT AND Apache-2.0"
